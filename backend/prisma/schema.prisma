@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  googleId      String?   @unique
+  microsoftId   String?   @unique
+  stripeCustomerId String?
+  subscription  Subscription?
+  meetings      Meeting[]
+  integrations  Integration[]
+  settings      UserSettings?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Subscription {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  plan      PlanType @default(FREE)
+  status    String   // active, canceled, past_due
+  currentPeriodEnd DateTime
+  meetingQuota Int   @default(5)
+  meetingUsed  Int   @default(0)
+}
+
+enum PlanType {
+  FREE
+  PRO
+  TEAM
+  ENTERPRISE
+}
+
+model Meeting {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  title       String
+  platform    String   // google-meet, zoom, teams
+  meetingCode String?
+  url         String?
+  status      MeetingStatus @default(SCHEDULED)
+  startedAt   DateTime?
+  endedAt     DateTime?
+  duration    Int?     // seconds
+  recordingUrl String?
+  
+  transcripts  Transcript[]
+  actionItems  ActionItem[]
+  summary      MeetingSummary?
+  participants Participant[]
+  shareLinks   ShareLink[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+model Transcript {
+  id          String   @id @default(cuid())
+  meetingId   String
+  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  content     String
+  speaker     String?
+  timestamp   DateTime
+  confidence  Float?
+  createdAt   DateTime @default(now())
+  
+  @@index([meetingId, timestamp])
+}
+
+model ActionItem {
+  id          String   @id @default(cuid())
+  meetingId   String
+  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  task        String
+  owner       String?
+  deadline    DateTime?
+  status      String   @default("PENDING") // PENDING, COMPLETED
+  createdAt   DateTime @default(now())
+}
+
+model MeetingSummary {
+  id          String   @id @default(cuid())
+  meetingId   String   @unique
+  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  summary     String   @db.Text
+  keyPoints   String[] 
+  decisions   String[]
+  topics      String[]
+  sentiment   String?
+  generatedAt DateTime @default(now())
+}
+
+model Integration {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   // hubspot, salesforce, notion, slack
+  config      Json     // API keys, settings
+  isActive    Boolean  @default(true)
+  lastSync    DateTime?
+  createdAt   DateTime @default(now())
+}
+
+model ShareLink {
+  id              String   @id @default(cuid())
+  meetingId       String
+  meeting         Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  token           String   @unique
+  expiresAt       DateTime
+  includeRecording Boolean @default(false)
+  accessCount     Int      @default(0)
+  createdAt       DateTime @default(now())
+}
+
+model UserSettings {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  autoRecord      Boolean  @default(false)
+  language        String   @default("en-US")
+  emailDigest     Boolean  @default(true)
+  crmAutoSync     Boolean  @default(false)
+  defaultCrm      String?
+}
