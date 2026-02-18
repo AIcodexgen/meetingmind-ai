@@ -1,1 +1,263 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MeetingMind AI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      width: 360px;
+      min-height: 500px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    
+    .header p {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+    
+    .content {
+      padding: 16px;
+    }
+    
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .meeting-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .meeting-item:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+    
+    .meeting-icon {
+      width: 40px;
+      height: 40px;
+      background: #f0f0f0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 20px;
+    }
+    
+    .meeting-info {
+      flex: 1;
+    }
+    
+    .meeting-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    
+    .meeting-time {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #e3f2fd;
+      color: #1976d2;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .status-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: #1976d2;
+      border-radius: 50%;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    
+    .stat {
+      text-align: center;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #667eea;
+    }
+    
+    .stat-label {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+    }
+    
+    .settings-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      color: #666;
+      text-decoration: none;
+      font-size: 13px;
+      border-top: 1px solid #e0e0e0;
+      margin-top: 12px;
+    }
+    
+    .settings-link:hover {
+      color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>MeetingMind AI</h1>
+    <p>Your intelligent meeting assistant</p>
+  </div>
+  
+  <div class="content">
+    <!-- Status Section -->
+    <div class="section">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div class="section-title">Status</div>
+          <div class="status-badge">Ready to record</div>
+        </div>
+        <div style="font-size: 24px;">🎙️</div>
+      </div>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="section">
+      <div class="section-title">This Month</div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" id="meeting-count">12</div>
+          <div class="stat-label">Meetings</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="hours-count">8.5</div>
+          <div class="stat-label">Hours</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="action-count">24</div>
+          <div class="stat-label">Actions</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Upcoming Meetings -->
+    <div class="section">
+      <div class="section-title">Upcoming</div>
+      <div id="upcoming-meetings">
+        <div class="meeting-item">
+          <div class="meeting-icon">📹</div>
+          <div class="meeting-info">
+            <div class="meeting-title">Product Review</div>
+            <div class="meeting-time">Today, 2:00 PM</div>
+          </div>
+        </div>
+        <div class="meeting-item">
+          <div class="meeting-icon">🤝</div>
+          <div class="meeting-info">
+            <div class="meeting-title">Client Call</div>
+            <div class="meeting-time">Tomorrow, 10:00 AM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Actions -->
+    <button class="btn btn-primary" id="view-dashboard">View Dashboard</button>
+    
+    <a href="#" class="settings-link" id="open-settings">
+      ⚙️ Settings & Integrations
+    </a>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
